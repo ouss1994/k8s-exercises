@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: webapp 
+  name: simpleapp
+  namespace: lab-8
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: webapp
+  template:
+    metadata:
+      labels:
+        run: webapp
+    spec:
+      containers:
+      - image: demo.goharbor.io/rci/simpleapp:2.0
+        name: simpleapp
+        ports:
+        - containerPort: 8080
+      imagePullSecrets:
+      - name: harbor-registry
