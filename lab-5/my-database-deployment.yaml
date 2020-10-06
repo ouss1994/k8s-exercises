@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: my-database
+  name: my-database
+  namespace: lab-5
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      tier: database
+  template:
+    metadata:
+      labels:
+        tier: database
+    spec:
+      containers:
+      - image: mysql:5.6
+        name: my-database
+        envFrom:
+        - configMapRef: 
+            name: db-config
+        - secretRef:
+            name: db-secret

@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    tier: frontend
+  name: httpd
+  namespace: lab-7
+spec:
+  containers:
+  - image: httpd:2.4
+    name: httpd
