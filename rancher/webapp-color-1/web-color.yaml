@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: magic-color
+  namespace: web-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: magic-color
+  template:
+    metadata:
+      labels:
+        app: magic-color
+    spec:
+      containers:
+      - image: ohasni1994/webapp-color:1.0
+        name: magic-color
+        ports:
+        - containerPort: 8080
+          name: magic-color
+          protocol: TCP
