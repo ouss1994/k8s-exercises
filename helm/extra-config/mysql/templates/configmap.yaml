@@ -1,0 +1,11 @@
+{{- if .Values.configMap }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "mysql.fullname" . }}
+  labels:
+    {{- include "mysql.labels" . | nindent 4 }}
+data:
+  MYSQL_DATABASE: {{ .Values.configMap.mysqlDatabase }}
+  MYSQL_USER: {{ .Values.configMap.mysqlUser }}
+{{- end }}

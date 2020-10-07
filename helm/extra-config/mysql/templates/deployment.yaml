@@ -2,16 +2,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "webapp-color.fullname" . }}
+  name: {{ include "mysql.fullname" . }}
   labels:
-    {{- include "webapp-color.labels" . | nindent 4 }}
+    {{- include "mysql.labels" . | nindent 4 }}
 spec:
 {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
 {{- end }}
   selector:
     matchLabels:
-      {{- include "webapp-color.selectorLabels" . | nindent 6 }}
+      {{- include "mysql.selectorLabels" . | nindent 6 }}
   template:
     metadata:
     {{- with .Values.podAnnotations }}
@@ -19,13 +19,13 @@ spec:
         {{- toYaml . | nindent 8 }}
     {{- end }}
       labels:
-        {{- include "webapp-color.selectorLabels" . | nindent 8 }}
+        {{- include "mysql.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "webapp-color.serviceAccountName" . }}
+      serviceAccountName: {{ include "mysql.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
@@ -35,19 +35,25 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - name: http
+            - name: mysql
               containerPort: {{ $svcPort }}
               protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /
-              port: {{ $svcPort }}
-          readinessProbe:
-            httpGet:
-              path: /
-              port: {{ $svcPort }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          {{- if .Values.secret }}
+          envFrom:
+          - secretRef:
+              name: {{ include "mysql.fullname" . }}
+          {{- if .Values.configMap }}
+          - configMapRef:
+              name: {{ include "mysql.fullname" . }}
+          {{- end }}
+          {{- end }}
+          volumeMounts:
+           {{- if .Values.persistence.enabled }}
+            - name: data
+              mountPath: /var/lib/mysql
+           {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -60,3 +66,10 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      volumes:
+       {{- if .Values.persistence.enabled }}
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "mysql.fullname" . }}
+       {{- end }}
+

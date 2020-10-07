@@ -48,6 +48,11 @@ spec:
               port: {{ $svcPort }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          {{- if .Values.configMap }}
+          envFrom:
+          - configMapRef:
+              name: {{ include "webapp-color.fullname" . }}
+          {{- end }}  
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
