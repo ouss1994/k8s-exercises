@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: my-database
+  name: mysql
+  namespace: phpmyadmin
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      tier: database
+  template:
+    metadata:
+      labels:
+        tier: database
+    spec:
+      containers:
+      - image: mysql:5.6
+        name: my-database
+        env:
+        - name:  MYSQL_ROOT_PASSWORD
+          valueFrom:  
+            secretKeyRef:
+              name: mysql-secret 
+              key: root-password
+        volumeMounts:
+        - name: data
+          mountPath: /var/lib/mysql
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: mysql-claim
