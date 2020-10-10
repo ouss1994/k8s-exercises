@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    run: webapp-color
+  name: webapp-color
+  namespace: web-color
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      run: webapp-color
+  template:
+    metadata:
+      labels:
+        run: webapp-color
+    spec:
+      containers:
+      - image: ohasni1994/webapp-color:1.0
+        name: webapp-color
